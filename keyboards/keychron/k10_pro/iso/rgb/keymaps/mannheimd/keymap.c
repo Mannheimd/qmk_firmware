@@ -31,13 +31,13 @@
 //     return true;
 // };
 
-// // clang-format off
-// enum layers{
-//   MAC_BASE,
-//   MAC_FN,
-//   WIN_BASE,
-//   WIN_FN
-// };
+// clang-format off
+enum layers{
+  MAC_BASE,
+  MAC_FN,
+  WIN_BASE,
+  WIN_FN
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_iso_109(
