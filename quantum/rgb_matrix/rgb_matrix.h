@@ -297,4 +297,5 @@ extern last_hit_t g_last_hit_tracker;
 #endif
 #ifdef RGB_MATRIX_FRAMEBUFFER_EFFECTS
 extern uint8_t g_rgb_frame_buffer[MATRIX_ROWS][MATRIX_COLS];
+extern uint8_t g_rgb_brightness_frame_buffer[MATRIX_ROWS][MATRIX_COLS];
 #endif

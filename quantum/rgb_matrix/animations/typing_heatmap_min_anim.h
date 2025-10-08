@@ -26,6 +26,7 @@ void process_rgb_matrix_typing_heatmap_min(uint8_t row, uint8_t col) {
 #        ifdef RGB_MATRIX_TYPING_HEATMAP_SLIM
     // Limit effect to pressed keys
     g_rgb_frame_buffer[row][col] = qadd8(g_rgb_frame_buffer[row][col], RGB_MATRIX_TYPING_HEATMAP_INCREASE_STEP);
+    g_rgb_brightness_frame_buffer[row][col] = qadd8(g_rgb_brightness_frame_buffer[row][col], RGB_MATRIX_TYPING_HEATMAP_INCREASE_STEP);
 #        else
     if (g_led_config.matrix_co[row][col] == NO_LED) { // skip as pressed key doesn't have an led position
         return;
@@ -37,6 +38,7 @@ void process_rgb_matrix_typing_heatmap_min(uint8_t row, uint8_t col) {
             }
             if (i_row == row && i_col == col) {
                 g_rgb_frame_buffer[row][col] = qadd8(g_rgb_frame_buffer[row][col], RGB_MATRIX_TYPING_HEATMAP_INCREASE_STEP);
+                g_rgb_brightness_frame_buffer[row][col] = qadd8(g_rgb_brightness_frame_buffer[row][col], RGB_MATRIX_TYPING_HEATMAP_INCREASE_STEP);
             } else {
 #            define LED_DISTANCE(led_a, led_b) sqrt16(((int16_t)(led_a.x - led_b.x) * (int16_t)(led_a.x - led_b.x)) + ((int16_t)(led_a.y - led_b.y) * (int16_t)(led_a.y - led_b.y)))
                 uint8_t distance = LED_DISTANCE(g_led_config.point[g_led_config.matrix_co[row][col]], g_led_config.point[g_led_config.matrix_co[i_row][i_col]]);
@@ -47,6 +49,7 @@ void process_rgb_matrix_typing_heatmap_min(uint8_t row, uint8_t col) {
                         amount = RGB_MATRIX_TYPING_HEATMAP_AREA_LIMIT;
                     }
                     g_rgb_frame_buffer[i_row][i_col] = qadd8(g_rgb_frame_buffer[i_row][i_col], amount);
+                    g_rgb_brightness_frame_buffer[i_row][i_col] = qadd8(g_rgb_brightness_frame_buffer[i_row][i_col], amount);
                 }
             }
         }
@@ -65,6 +68,7 @@ bool TYPING_HEATMAP_MIN(effect_params_t* params) {
     if (params->init) {
         rgb_matrix_set_color_all(0, 0, 0);
         memset(g_rgb_frame_buffer, 0, sizeof g_rgb_frame_buffer);
+        memset(g_rgb_brightness_frame_buffer, 0, sizeof g_rgb_brightness_frame_buffer);
     }
 
     // The heatmap animation might run in several iterations depending on
@@ -85,25 +89,30 @@ bool TYPING_HEATMAP_MIN(effect_params_t* params) {
         for (uint8_t col = 0; col < MATRIX_COLS && RGB_MATRIX_LED_PROCESS_LIMIT; col++) {
             if (g_led_config.matrix_co[row][col] >= led_min && g_led_config.matrix_co[row][col] < led_max) {
                 count++;
-                uint8_t val = g_rgb_frame_buffer[row][col];
+
                 if (!HAS_ANY_FLAGS(g_led_config.flags[g_led_config.matrix_co[row][col]], params->flags)) continue;
 
-                uint8_t brightness = scale8((qadd8(170, val) - 170) * 3, rgb_matrix_config.hsv.v)
+                uint8_t val = g_rgb_frame_buffer[row][col];
+                uint8_t brightness = g_rgb_brightness_frame_buffer[row][col];
 
                 if (brightness < RGB_MATRIX_TYPING_HEATMAP_MIN_BRIGHTNESS) {
-                    brightness = RGB_MATRIX_TYPING_HEATMAP_MIN_BRIGHTNESS;
+                    g_rgb_brightness_frame_buffer[row][col] = RGB_MATRIX_TYPING_HEATMAP_MIN_BRIGHTNESS;
                 }
 
                 hsv_t hsv = {
-                    170 - qsub8(val, 85),
+                    qsub8(170, qsub8(val, 20)),
                     rgb_matrix_config.hsv.s,
-                    brightness
+                    scale8((qadd8(170, brightness) - 170) * 3, rgb_matrix_config.hsv.v)
                 };
                 rgb_t rgb = rgb_matrix_hsv_to_rgb(hsv);
                 rgb_matrix_set_color(g_led_config.matrix_co[row][col], rgb.r, rgb.g, rgb.b);
 
                 if (decrease_heatmap_values) {
                     g_rgb_frame_buffer[row][col] = qsub8(val, 1);
+
+                    if (brightness > RGB_MATRIX_TYPING_HEATMAP_MIN_BRIGHTNESS) {
+                        g_rgb_brightness_frame_buffer[row][col] = qsub8(brightness, 1);
+                    }
                 }
             }
         }
