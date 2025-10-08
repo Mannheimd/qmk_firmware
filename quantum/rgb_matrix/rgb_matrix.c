@@ -223,6 +223,10 @@ void rgb_matrix_handle_key_event(uint8_t row, uint8_t col, bool pressed) {
         if (rgb_matrix_config.mode == RGB_MATRIX_TYPING_HEATMAP) {
             process_rgb_matrix_typing_heatmap(row, col);
         }
+
+        if (rgb_matrix_config.mode == RGB_MATRIX_TYPING_HEATMAP_MIN) {
+            process_rgb_matrix_typing_heatmap_min(row, col);
+        }
     }
 #endif // defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && defined(ENABLE_RGB_MATRIX_TYPING_HEATMAP)
 }
