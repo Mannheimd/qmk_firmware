@@ -36,9 +36,18 @@
 /* Turn off backllit if brightness value is low */
 #    define RGB_MATRIX_TURN_OFF_VAL 48
 
-#    define NUM_LOCK_INDEX 37 // NumLock
-
 #    define LOW_BAT_IND_INDEX 99 // Space
+
+#define RGB_MATRIX_TYPING_HEATMAP_INCREASE_STEP 16
+#define RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS 200
+#define RGB_MATRIX_TYPING_HEATMAP_SPREAD 120
+#define RGB_MATRIX_TYPING_HEATMAP_AREA_LIMIT 3
+
+#undef RGB_MATRIX_DEFAULT_MODE
+#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_TYPING_HEATMAP
+
+#define CAPS_LOCK_INDEX 61
+#undef NUM_LOCK_INDEX
 
 // RGB Matrix Animation modes. Explicitly enabled
 // For full list of effects, see:
