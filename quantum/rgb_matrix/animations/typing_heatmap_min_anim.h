@@ -102,7 +102,8 @@ bool TYPING_HEATMAP_MIN(effect_params_t* params) {
                 hsv_t hsv = {
                     qsub8(170, qsub8(val, 20)),
                     rgb_matrix_config.hsv.s,
-                    scale8((qadd8(170, brightness) - 170) * 3, rgb_matrix_config.hsv.v)
+                    // scale8((qadd8(170, brightness) - 170) * 3, rgb_matrix_config.hsv.v)
+                    255
                 };
                 rgb_t rgb = rgb_matrix_hsv_to_rgb(hsv);
                 rgb_matrix_set_color(g_led_config.matrix_co[row][col], rgb.r, rgb.g, rgb.b);
